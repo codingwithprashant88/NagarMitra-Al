@@ -227,24 +227,75 @@ function ReportModal({ onClose, onSubmit }) {
         </div>
         <form className="db-form" onSubmit={submit} noValidate>
           <div className="db-field">
-            <label htmlFor="rep-photo">Photo</label>
-            <label className="db-drop" htmlFor="rep-photo">
-              {photo ? (
-                <img src={photo.url} alt="Selected issue" />
-              ) : (
-                <>
-                  <strong>Tap to add a photo</strong>
-                  <span>Take a picture or choose from gallery</span>
-                </>
-              )}
+            <label>Photo of the issue</label>
+
+            <div className="grid grid-cols-2 gap-3">
+              {/* Gallery option */}
+              <label
+                htmlFor="rep-gallery"
+                className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center transition hover:border-teal-500 hover:bg-teal-50"
+              >
+                <span className="text-3xl">🖼️</span>
+                <strong className="text-sm text-slate-800">Gallery</strong>
+                <span className="text-xs text-slate-500">
+                  Choose existing photo
+                </span>
+              </label>
+
               <input
-                id="rep-photo"
+                id="rep-gallery"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={pickPhoto}
+              />
+
+              {/* Camera option */}
+              <label
+                htmlFor="rep-camera"
+                className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center transition hover:border-teal-500 hover:bg-teal-50"
+              >
+                <span className="text-3xl">📷</span>
+                <strong className="text-sm text-slate-800">Camera</strong>
+                <span className="text-xs text-slate-500">
+                  Take a new picture
+                </span>
+              </label>
+
+              <input
+                id="rep-camera"
                 type="file"
                 accept="image/*"
                 capture="environment"
+                className="hidden"
                 onChange={pickPhoto}
               />
-            </label>
+            </div>
+
+            {/* Selected image preview */}
+            {photo && (
+              <div className="mt-3">
+                <img
+                  src={photo.url}
+                  alt="Selected issue"
+                  className="h-48 w-full rounded-xl object-cover"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    URL.revokeObjectURL(photo.url);
+                    setPhoto(null);
+                    setAnalysis(null);
+                    setAiError("");
+                  }}
+                  className="mt-2 text-sm font-medium text-red-600"
+                >
+                  Remove photo
+                </button>
+              </div>
+            )}
+
             {errors.photo && (
               <span className="db-err" role="alert">
                 {errors.photo}
@@ -252,7 +303,7 @@ function ReportModal({ onClose, onSubmit }) {
             )}
 
             {aiBusy && (
-              <p className="db-meta" role="status">
+              <p className="db-meta mt-2" role="status">
                 AI is analyzing your image...
               </p>
             )}
@@ -264,7 +315,7 @@ function ReportModal({ onClose, onSubmit }) {
             )}
 
             {analysis && (
-              <div className="db-badges" aria-live="polite">
+              <div className="db-badges mt-2" aria-live="polite">
                 <span className="db-badge Pending">AI: {analysis.label}</span>
 
                 <span className={`db-badge ${analysis.severity}`}>
