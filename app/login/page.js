@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Bricolage_Grotesque, Figtree } from "next/font/google";
 import { useRouter } from "next/navigation";
 
-
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
   variable: "--font-display",
@@ -188,7 +187,7 @@ function RegisterForm({ goLogin }) {
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
-
+  const route = useRouter();
   const set = (key) => (e) => {
     const { type, checked, value } = e.target;
 
@@ -200,7 +199,6 @@ function RegisterForm({ goLogin }) {
 
   async function submit(e) {
     e.preventDefault();
-    const route = useRouter();
 
     const er = {};
 
