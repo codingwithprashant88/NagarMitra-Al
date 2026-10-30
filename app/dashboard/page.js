@@ -228,45 +228,116 @@ function ReportModal({ onClose, onSubmit }) {
           </button>
         </div>
         <form className="db-form" onSubmit={submit} noValidate>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => galleryRef.current?.click()}
-              className="flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center"
-            >
-              <span className="text-3xl">🖼️</span>
-              <strong className="text-sm text-slate-800">Gallery</strong>
-              <span className="text-xs text-slate-500">
-                Choose existing photo
+          <div className="db-field">
+            <label>Photo of the issue</label>
+
+            <div className="grid grid-cols-2 gap-3">
+              {/* Gallery option */}
+              <button
+                type="button"
+                onClick={() => galleryRef.current?.click()}
+                className="flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center transition hover:border-teal-500 hover:bg-teal-50"
+              >
+                <span className="text-3xl">🖼️</span>
+                <strong className="text-sm text-slate-800">Gallery</strong>
+                <span className="text-xs text-slate-500">
+                  Choose existing photo
+                </span>
+              </button>
+
+              {/* Camera option */}
+              <button
+                type="button"
+                onClick={() => cameraRef.current?.click()}
+                className="flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center transition hover:border-teal-500 hover:bg-teal-50"
+              >
+                <span className="text-3xl">📷</span>
+                <strong className="text-sm text-slate-800">Camera</strong>
+                <span className="text-xs text-slate-500">
+                  Take a new picture
+                </span>
+              </button>
+
+              {/* Gallery input */}
+              <input
+                ref={galleryRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  pickPhoto(e);
+                  e.target.value = "";
+                }}
+              />
+
+              {/* Camera input */}
+              <input
+                ref={cameraRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(e) => {
+                  pickPhoto(e);
+                  e.target.value = "";
+                }}
+              />
+            </div>
+
+            {/* Selected image preview */}
+            {photo && (
+              <div className="mt-3">
+                <img
+                  src={photo.url}
+                  alt="Selected issue"
+                  className="h-48 w-full rounded-xl object-cover"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    URL.revokeObjectURL(photo.url);
+                    setPhoto(null);
+                    setAnalysis(null);
+                    setAiError("");
+                    setErrors((prev) => ({ ...prev, photo: "" }));
+                  }}
+                  className="mt-2 text-sm font-medium text-red-600"
+                >
+                  Remove photo
+                </button>
+              </div>
+            )}
+
+            {errors.photo && (
+              <span className="db-err" role="alert">
+                {errors.photo}
               </span>
-            </button>
+            )}
 
-            <button
-              type="button"
-              onClick={() => cameraRef.current?.click()}
-              className="flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white p-4 text-center"
-            >
-              <span className="text-3xl">📷</span>
-              <strong className="text-sm text-slate-800">Camera</strong>
-              <span className="text-xs text-slate-500">Take a new picture</span>
-            </button>
+            {aiBusy && (
+              <p className="db-meta mt-2" role="status">
+                AI is analyzing your image...
+              </p>
+            )}
 
-            <input
-              ref={galleryRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={pickPhoto}
-            />
+            {aiError && (
+              <span className="db-err" role="alert">
+                {aiError}
+              </span>
+            )}
 
-            <input
-              ref={cameraRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={pickPhoto}
-            />
+            {analysis && (
+              <div className="db-badges mt-2" aria-live="polite">
+                <span className="db-badge Pending">AI: {analysis.label}</span>
+
+                <span className={`db-badge ${analysis.severity}`}>
+                  {analysis.severity} severity
+                </span>
+
+                <p className="db-meta">{analysis.description}</p>
+              </div>
+            )}
           </div>
 
           <div className="db-field">
